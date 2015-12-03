@@ -1,57 +1,141 @@
-<div id="topic_list">
-  <%- partial('../topic/abstract', {collection:topics, as:'topic'}) %>
-</div>
-<div class='pagination' current_page='<%= current_page %>'>
-  <ul>
-    <% var base_url = base + (base.indexOf('?') < 0 ? '?' : '&')
-      + 'tab=' + (typeof tab !== 'undefined' ? tab : '') + '&page='; %>
-    <% if (current_page == 1) { %>
-    <li class='disabled'><a>«</a></li>
-    <% } else { %>
-    <li><a href="<%= base_url %>1">«</a></li>
-    <% } %>
+<%
+var monthNames = ["January", "February", "March","April", "May", "June", "July", "August", "September","October", "November", "December"];
 
-    <%
-    var page_start = current_page - 2 > 0 ? current_page - 2 : 1;
-    var page_end = page_start + 4 >= pages ? pages : page_start + 4;
-    %>
+function formatDate(date){
+    var day = date.getDate();
+    var month = date.getMonth();
+    var year = date.getFullYear().toString().substring(2);
+    return monthNames[month]+' '+day+"'"+year;
+}
 
-    <% if (page_start > 1) { %>
-    <li><a>...</a></li>
-    <% } %>
+var helpers={
 
-    <% for(var i = page_start; i <= page_end; i++) { %>
-    <% if (i === current_page) { %>
-    <li class='disabled'><a><%= i %></a></li>
-    <% } else { %>
-    <li><a href='<%= base_url + i %>'><%= i %></a></li>
-    <% } %>
-    <% } %>
+    fromNow : function(date){
+        return moment(new Date(date)).fromNow();
+    },
 
-    <% if (page_end < pages ) { %>
-    <li><a>...</a></li>
-    <% } %>
-
-    <% if (current_page == pages) { %>
-    <li class='disabled'><a>»</a></li>
-    <% } else { %>
-    <li><a href='<%= base_url + pages %>'>»</a></li>
-    <% } %>
-  </ul>
-</div>
-<script>
-  $(document).ready(function () {
-    var $nav = $('.pagination');
-    var current_page = $nav.attr('current_page');
-    if (current_page) {
-      $nav.find('li').each(function () {
-        var $li = $(this);
-        var $a = $li.find('a');
-        if ($a.html() == current_page) {
-          $li.addClass('active');
-          $a.removeAttr('href');
+    topicIcon: function(type) {
+        var faClassName='';
+        switch(type){
+            case 'showcase':
+                faClassName='mdi-code-array';
+                break;
+            case 'repo':
+                faClassName='mdi-cloud';
+                break;
+            case 'link':
+                faClassName='mdi-link-variant';
+                break;
+            case 'discussion':
+                faClassName='mdi-message-text';
+                break;
+            case 'poll':
+                faClassName='mdi-poll-box';
+                break;
         }
-      });
+        return faClassName;
+    },
+
+    typeIconClass:function(type){
+        var faClassName = '';
+        switch(type){
+            case 'showcase':
+                faClassName='snippet';
+                break;
+            case 'repo':
+                faClassName='repo';
+                break;
+            case 'link':
+                faClassName='link';
+                break;
+            case 'discussion':
+                faClassName='discussion';
+                break;
+            case 'poll':
+                faClassName='poll';
+                break;
+        }
+        return faClassName;
+    },
+
+    capitalize:function(val){
+        return val.charAt(0).toUpperCase() + val.slice(1);
+    },
+    hostname : function(link){
+        return new URL(link).hostname;
     }
-  });
-</script>
+}
+
+%>
+
+<% for(var j=0; j< topics.length; j++) { %>
+ 
+<div class="row post-item  ">
+
+    <div class="col-xs-12 single-thread feed-single-thread">
+
+        <div class="row">
+
+            <div class="col-xs-12">
+                <div class="row post-header">
+                    <div class="col-sm-10 col-xs-8 headers-col">
+                        
+                        <div class="profile-img-col hidden-xs">
+                           <a href="/weixin/read/<%=topics[j]._id%>" target="_blank">  <%=topics[j].title%></a>
+                        </div>
+                        <p class="header-text-content  ">
+                             
+                        
+                    </div>
+                    <div class="col-sm-2  col-xs-4 headers-col extra-col text-right">
+                        <a class="topic-icon-placeholder  " href="/post/<%=topics[j]._id + '/'+ topics[j].title %>" target="_blank">
+                            <i class="mdi  "></i>
+                        </a>
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                     
+                    <div class="col-sm-12 duplicate-alert-cover">
+                        
+                    </div>
+                  
+
+                     
+                    <div class="col-md-3 post-link-image-container hidden-xs hidden-sm">
+ 
+                    </div>
+                    
+                    <div class="col-xs-12   ">
+                        <h2>
+                           
+                        </h2>
+
+                        <div class="post-description">
+                            <p><%- topics[j].abstract%></p>
+                            
+                            <% for(var i=0; i < topics[j].image_list.length; i++) { %>
+
+                              <a href="/weixin/read/<%=topics[j]._id%>" target="_blank">
+                              <img src="<%=topics[j].image_list[i].url%>">
+                              </a>
+                            <% } %> 
+                        </div>
+                    </div>
+                </div>
+
+                 
+                
+            </div>
+        </div>
+
+        
+        
+
+         
+    </div>
+</div>
+
+ <% } %>

@@ -66,7 +66,7 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 app.engine('html', require('ejs-mate'));
-app.locals._layoutFile = 'layout.html';
+//app.locals._layoutFile = 'layout.html';
 app.enable('trust proxy');
 
 // Request logger。请求时间

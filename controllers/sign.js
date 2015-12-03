@@ -14,42 +14,43 @@ exports.showSignup = function (req, res) {
 };
 
 exports.signup = function (req, res, next) {
-  var loginname = validator.trim(req.body.loginname).toLowerCase();
-  var email     = validator.trim(req.body.email).toLowerCase();
+  //var loginname = validator.trim(req.body.loginname).toLowerCase();
+ // var email     = validator.trim(req.body.email).toLowerCase();
   var pass      = validator.trim(req.body.pass);
-  var rePass    = validator.trim(req.body.re_pass);
+  var name      = validator.trim(req.body.name);
+  //var rePass    = validator.trim(req.body.re_pass);
 
   var ep = new eventproxy();
   ep.fail(next);
   ep.on('prop_err', function (msg) {
     res.status(422);
-    res.render('sign/signup', {error: msg, loginname: loginname, email: email});
+    res.render('sign/signup', {error: msg});
   });
 
   // 验证信息的正确性
-  if ([loginname, pass, rePass, email].some(function (item) { return item === ''; })) {
+  if ([name, pass].some(function (item) { return item === ''; })) {
     ep.emit('prop_err', '信息不完整。');
     return;
   }
-  if (loginname.length < 5) {
+  if (name.length < 5) {
     ep.emit('prop_err', '用户名至少需要5个字符。');
     return;
   }
-  if (!tools.validateId(loginname)) {
+  if (!tools.validateId(name)) {
     return ep.emit('prop_err', '用户名不合法。');
   }
-  if (!validator.isEmail(email)) {
-    return ep.emit('prop_err', '邮箱不合法。');
-  }
-  if (pass !== rePass) {
-    return ep.emit('prop_err', '两次密码输入不一致。');
-  }
+  // if (!validator.isEmail(email)) {
+  //   return ep.emit('prop_err', '邮箱不合法。');
+  // }
+  // if (pass !== rePass) {
+  //   return ep.emit('prop_err', '两次密码输入不一致。');
+  // }
   // END 验证信息的正确性
 
 
   User.getUsersByQuery({'$or': [
-    {'loginname': loginname},
-    {'email': email}
+    {'name': name}
+     
   ]}, {}, function (err, users) {
     if (err) {
       return next(err);
@@ -61,15 +62,15 @@ exports.signup = function (req, res, next) {
 
     tools.bhash(pass, ep.done(function (passhash) {
       // create gravatar
-      var avatarUrl = User.makeGravatar(email);
-      User.newAndSave(loginname, loginname, passhash, email, avatarUrl, false, function (err) {
+      var avatarUrl = User.makeGravatar(name);
+      User.newAndSave(name, passhash, avatarUrl, true, function (err) {
         if (err) {
           return next(err);
         }
         // 发送激活邮件
-        mail.sendActiveMail(email, utility.md5(email + passhash + config.session_secret), loginname);
+        //mail.sendActiveMail(email, utility.md5(email + passhash + config.session_secret), loginname);
         res.render('sign/signup', {
-          success: '欢迎加入 ' + config.name + '！我们已给您的注册邮箱发送了一封邮件，请点击里面的链接来激活您的帐号。'
+          success: '欢迎加入 ' + config.name + ''//！我们已给您的注册邮箱发送了一封邮件，请点击里面的链接来激活您的帐号。'
         });
       });
 

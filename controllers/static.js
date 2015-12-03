@@ -3,7 +3,7 @@ var multiline = require('multiline');
 // About
 exports.about = function (req, res, next) {
   res.render('static/about', {
-    pageTitle: '关于我们'
+    pageTitle: '关于我们adfasdf'
   });
 };
 

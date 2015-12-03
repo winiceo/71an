@@ -9,143 +9,147 @@
  * Module dependencies.
  */
 
-var User         = require('../proxy').User;
-var Topic        = require('../proxy').Topic;
+ 
 var config       = require('../config');
 var eventproxy   = require('eventproxy');
 var cache        = require('../common/cache');
 var xmlbuilder   = require('xmlbuilder');
 var renderHelper = require('../common/render_helper');
 var _            = require('lodash');
-
+var models     = require('../models');
+var Article      = models.Article;
+var extend = require('util')._extend;
 exports.index = function (req, res, next) {
-  var page = parseInt(req.query.page, 10) || 1;
-  page = page > 0 ? page : 1;
-  var tab = req.query.tab || 'all';
-
+   var skip=parseInt(req.query.skip,10)||0;
+   
   var proxy = new eventproxy();
   proxy.fail(next);
 
   // 取主题
   var query = {};
-  if (tab && tab !== 'all') {
-    if (tab === 'good') {
-      query.good = true;
-    } else {
-      query.tab = tab;
-    }
-  }
+   
 
   var limit = config.list_topic_count;
-  var options = { skip: (page - 1) * limit, limit: limit, sort: '-top -last_reply_at'};
+  var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
 
-  Topic.getTopicsByQuery(query, options, proxy.done('topics', function (topics) {
-    return topics;
-  }));
+  Article.find(query, {}, options, function (err, topics) {
+      res.render('index',{topics:topics}) 
+  })
+   
+    
+};
 
-  // 取排行榜上的用户
-  cache.get('tops', proxy.done(function (tops) {
-    if (tops) {
-      proxy.emit('tops', tops);
-    } else {
-      User.getUsersByQuery(
-        {is_block: false},
-        { limit: 10, sort: '-score'},
-        proxy.done('tops', function (tops) {
-          cache.set('tops', tops, 60 * 1);
-          return tops;
-        })
-      );
+
+
+//加载更多
+exports.loadmore = function (req, res, next) {
+
+     
+//article.save();
+  var skip=parseInt(req.query.skip,10)||25;
+   
+  var proxy = new eventproxy();
+  proxy.fail(next);
+
+  // 取主题
+  var query = {};
+   
+
+  var limit = config.list_topic_count;
+  var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
+
+  Article.find(query,{},options ,function (err, topics) {
+     res.json({topics:topics}) 
+  })
+     
+  
+  
+};
+ 
+//阅读
+exports.read = function (req, res, next) {
+ 
+     
+//article.save();
+  var id= req.params.id;
+   
+   
+ var query={};
+   if( !isNaN( id ) )
+  {
+    query={"oid":id};
+    
+  }else{
+      query={"_id":id};
+  }
+  Article.find(query, function (err, topic) {
+    if(err){
+      return res.status(403).send('主题不存在');
     }
-  }));
-  // END 取排行榜上的用户
+    
 
-  // 取0回复的主题
-  cache.get('no_reply_topics', proxy.done(function (no_reply_topics) {
-    if (no_reply_topics) {
-      proxy.emit('no_reply_topics', no_reply_topics);
-    } else {
-      Topic.getTopicsByQuery(
-        { reply_count: 0, tab: {$ne: 'job'}},
-        { limit: 5, sort: '-create_at'},
-        proxy.done('no_reply_topics', function (no_reply_topics) {
-          cache.set('no_reply_topics', no_reply_topics, 60 * 1);
-          return no_reply_topics;
-        }));
+     var topic=topic[0];
+     if(topic){
+      var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
+      
+      res.render('read',{topic:topic2}) 
+    }else{
+      return res.status(403).send('主题不存在');
     }
-  }));
-  // END 取0回复的主题
+    
+     
+  })
+     
+ 
 
-  // 取分页数据
-  var pagesCacheKey = JSON.stringify(query) + 'pages';
-  cache.get(pagesCacheKey, proxy.done(function (pages) {
-    if (pages) {
-      proxy.emit('pages', pages);
-    } else {
-      Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
-        var pages = Math.ceil(all_topics_count / limit);
-        cache.set(pagesCacheKey, pages, 60 * 1);
-        proxy.emit('pages', pages);
-      }));
-    }
-  }));
+  // // 取排行榜上的用户
+  // cache.get('tops', proxy.done(function (tops) {
+  //   if (tops) {
+  //     proxy.emit('tops', tops);
+  //   } else {
+  //     User.getUsersByQuery(
+  //       {is_block: false},
+  //       { limit: 10, sort: '-score'},
+  //       proxy.done('tops', function (tops) {
+  //         cache.set('tops', tops, 60 * 1);
+  //         return tops;
+  //       })
+  //     );
+  //   }
+  // }));
+  // // END 取排行榜上的用户
+
+  // // 取0回复的主题
+  // cache.get('no_reply_topics', proxy.done(function (no_reply_topics) {
+  //   if (no_reply_topics) {
+  //     proxy.emit('no_reply_topics', no_reply_topics);
+  //   } else {
+  //     Topic.getTopicsByQuery(
+  //       { reply_count: 0, tab: {$ne: 'job'}},
+  //       { limit: 5, sort: '-create_at'},
+  //       proxy.done('no_reply_topics', function (no_reply_topics) {
+  //         cache.set('no_reply_topics', no_reply_topics, 60 * 1);
+  //         return no_reply_topics;
+  //       }));
+  //   }
+  // }));
+  // // END 取0回复的主题
+
+  // // 取分页数据
+  // var pagesCacheKey = JSON.stringify(query) + 'pages';
+  // cache.get(pagesCacheKey, proxy.done(function (pages) {
+  //   if (pages) {
+  //     proxy.emit('pages', pages);
+  //   } else {
+  //     Topic.getCountByQuery(query, proxy.done(function (all_topics_count) {
+  //       var pages = Math.ceil(all_topics_count / limit);
+  //       cache.set(pagesCacheKey, pages, 60 * 1);
+  //       proxy.emit('pages', pages);
+  //     }));
+  //   }
+  // }));
   // END 取分页数据
 
-  var tabName = renderHelper.tabName(tab);
-  proxy.all('topics', 'tops', 'no_reply_topics', 'pages',
-    function (topics, tops, no_reply_topics, pages) {
-      res.render('index', {
-        topics: topics,
-        current_page: page,
-        list_topic_count: limit,
-        tops: tops,
-        no_reply_topics: no_reply_topics,
-        pages: pages,
-        tabs: config.tabs,
-        tab: tab,
-        pageTitle: tabName && (tabName + '版块'),
-      });
-    });
-};
-
-exports.sitemap = function (req, res, next) {
-  var urlset = xmlbuilder.create('urlset',
-    {version: '1.0', encoding: 'UTF-8'});
-  urlset.att('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-
-  var ep = new eventproxy();
-  ep.fail(next);
-
-  ep.all('sitemap', function (sitemap) {
-    res.type('xml');
-    res.send(sitemap);
-  });
-
-  cache.get('sitemap', ep.done(function (sitemapData) {
-    if (sitemapData) {
-      ep.emit('sitemap', sitemapData);
-    } else {
-      Topic.getLimit5w(function (err, topics) {
-        if (err) {
-          return next(err);
-        }
-        topics.forEach(function (topic) {
-          urlset.ele('url').ele('loc', 'http://cnodejs.org/topic/' + topic._id);
-        });
-
-        var sitemapData = urlset.end();
-        // 缓存一天
-        cache.set('sitemap', sitemapData, 3600 * 24);
-        ep.emit('sitemap', sitemapData);
-      });
-    }
-  }));
-};
-
-exports.appDownload = function (req, res, next) {
-  if (/Android/i.test(req.headers['user-agent'])) {
-    res.redirect('http://fir.im/ks4u');
-  } else {
-    res.redirect('https://itunes.apple.com/cn/app/id954734793');
-  }
+   
+  
 };

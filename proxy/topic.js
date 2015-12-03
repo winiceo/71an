@@ -6,6 +6,7 @@ var Reply      = require('./reply');
 var tools      = require('../common/tools');
 var at         = require('../common/at');
 var _          = require('lodash');
+var renderHelper = require('../common/render_helper');
 
 
 /**
@@ -80,7 +81,9 @@ exports.getTopicsByQuery = function (query, opt, callback) {
       return callback(null, []);
     }
 
+
     var proxy = new EventProxy();
+    proxy.emit('topic_ready');
     proxy.after('topic_ready', topics.length, function () {
       topics = _.compact(topics); // 删除不合规的 topic
       return callback(null, topics);
@@ -215,11 +218,12 @@ exports.reduceCount = function (id, callback) {
   });
 };
 
-exports.newAndSave = function (title, content, tab, authorId, callback) {
+exports.newAndSave = function (title, content, type, authorId, callback) {
   var topic       = new Topic();
   topic.title     = title;
-  topic.content   = content;
-  topic.tab       = tab;
+  topic.content   = renderHelper.markdown(content);
+  topic.contentMarkdown   = content;
+  topic.type       = type;
   topic.author_id = authorId;
 
   topic.save(callback);

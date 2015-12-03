@@ -18,8 +18,12 @@ var store        = require('../common/store');
 var config       = require('../config');
 var _            = require('lodash');
 var cache        = require('../common/cache');
+var models       = require('../models');
+var UserModel    = models.User;
+var app  =require('../app')
+var TopicM      = models.Topic;
 
-/**
+  /**
  * Topic page
  *
  * @param  {HttpRequest} req
@@ -40,7 +44,7 @@ exports.index = function (req, res, next) {
   }
   var events = ['topic', 'other_topics', 'no_reply_topics'];
   var ep = EventProxy.create(events, function (topic, other_topics, no_reply_topics) {
-    res.render('topic/index', {
+    res.render('topic/read', {
       topic: topic,
       author_other_topics: other_topics,
       no_reply_topics: no_reply_topics,
@@ -107,27 +111,26 @@ exports.create = function (req, res, next) {
 };
 
 
+
 exports.put = function (req, res, next) {
-  var title   = validator.trim(req.body.title);
-  var tab     = validator.trim(req.body.tab);
-  var content = validator.trim(req.body.t_content);
+  var title   =  req.body.title ;
+  var type     =  req.body.type ;
+  var content =  req.body.contentMarkdown;
 
   // 得到所有的 tab, e.g. ['ask', 'share', ..]
-  var allTabs = config.tabs.map(function (tPair) {
-    return tPair[0];
-  });
+  // var allTabs = config.tabs.map(function (tPair) {
+  //   return tPair[0];
+  // });
 
   // 验证
   var editError;
-  if (title === '') {
-    editError = '标题不能是空的。';
-  } else if (title.length < 5 || title.length > 100) {
-    editError = '标题字数太多或太少。';
-  } else if (!tab || allTabs.indexOf(tab) === -1) {
-    editError = '必须选择一个版块。';
-  } else if (content === '') {
-    editError = '内容不可为空';
-  }
+  // if (title === '') {
+  //   editError = '标题不能是空的。';
+  // } else if (title.length < 5 || title.length > 100) {
+  //   editError = '标题字数太多或太少。';
+  // }else if (content === '') {
+  //   editError = '内容不可为空';
+  // }
   // END 验证
 
   if (editError) {
@@ -135,12 +138,12 @@ exports.put = function (req, res, next) {
     return res.render('topic/edit', {
       edit_error: editError,
       title: title,
-      content: content,
-      tabs: config.tabs
+      content: content
+       
     });
   }
 
-  Topic.newAndSave(title, content, tab, req.session.user._id, function (err, topic) {
+  Topic.newAndSave(title, content, type, req.session.user._id, function (err, topic) {
     if (err) {
       return next(err);
     }
@@ -148,7 +151,7 @@ exports.put = function (req, res, next) {
     var proxy = new EventProxy();
 
     proxy.all('score_saved', function () {
-      res.redirect('/topic/' + topic._id);
+      res.json(topic);
     });
     proxy.fail(next);
     User.getUserById(req.session.user._id, proxy.done(function (user) {
@@ -160,7 +163,7 @@ exports.put = function (req, res, next) {
     }));
 
     //发送at消息
-    at.sendMessageToMentionUsers(content, topic._id, req.session.user._id);
+   // at.sendMessageToMentionUsers(content, topic._id, req.session.user._id);
   });
 };
 

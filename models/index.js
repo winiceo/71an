@@ -16,6 +16,8 @@ require('./topic');
 require('./reply');
 require('./topic_collect');
 require('./message');
+require('./article');
+exports.Article        = mongoose.model('Article');
 
 exports.User         = mongoose.model('User');
 exports.Topic        = mongoose.model('Topic');

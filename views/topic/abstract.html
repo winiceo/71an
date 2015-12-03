@@ -26,14 +26,14 @@
     <span class='last_time pull-right'>
       <span class="last_active_time"><%= topic.create_at_ago() %></span>
     </span>
-  <% } %>
+  <% } %>  
 
   <div class="topic_title_wrapper">
 
     <%- partial('./_top_good', {topic: topic}) %>
-
+  
     <a class='topic_title' href='/topic/<%= topic._id %>' title='<%= topic.title %>'>
-      <%= topic.title %>
+      <div class=''><%- markdown(topic.content) %></div>
     </a>
   </div>
 </div>

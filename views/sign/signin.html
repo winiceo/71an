@@ -1,47 +1,206 @@
-<%- partial('../sign/sidebar') %>
 
-<div id='content'>
-  <div class='panel'>
-    <div class='header'>
-      <ul class='breadcrumb'>
-        <li><a href='/'>主页</a><span class='divider'>/</span></li>
-        <li class='active'>登录</li>
-      </ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome Aboard - devmag.io</title>
+
+    <link rel="stylesheet" href="/public/devmag-welcome.min.css"/>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/images/favicons/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/images/favicons/apple-touch-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/images/favicons/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/favicons/apple-touch-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/images/favicons/apple-touch-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/images/favicons/apple-touch-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/images/favicons/apple-touch-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/images/favicons/apple-touch-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicons/apple-touch-icon-180x180.png">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-194x194.png" sizes="194x194">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/images/favicons/android-chrome-192x192.png" sizes="192x192">
+    <link rel="icon" type="image/png" href="/images/favicons/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/images/favicons/manifest.json">
+    <link rel="shortcut icon" href="/images/favicons/favicon.ico">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="msapplication-TileImage" content="/images/favicons/mstile-144x144.png">
+    <meta name="msapplication-config" content="/images/favicons/browserconfig.xml">
+
+     <!-- style -->
+ <%- Loader('/public/index.min.js')
+  .js('/public/libs/jquery-2.1.0.js')
+  .js('/public/libs/lodash.compat.js')
+  .js('/public/libs/jquery-ujs.js')
+  .js('/public/libs/bootstrap/js/bootstrap.js')
+  .js('/public/libs/jquery.caret.js')
+  .js('/public/libs/jquery.atwho.js')
+  .js('/public/libs/markdownit.js')
+  .js('/public/libs/code-prettify/prettify.js')
+  .js('/public/libs/qrcode.js')
+  .js('/public/javascripts/main.js')
+  .js('/public/javascripts/responsive.js')
+  .done(assets, config.site_static_host, config.mini_assets)
+  %>
+</head>
+<body>
+
+<div class="header">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 logo-container">
+                <p><img src="https://d1el8zjwha082o.cloudfront.net/devmagio-logo-new.png" class="logo"/><span>Welcome Aboard!</span></p>
+            </div>
+        </div>
     </div>
-    <div class='inner'>
-      <% if(typeof(error) !== 'undefined' && error){ %>
+</div>
+<div class="onboarding-content">
+    <div class="container">
+        <div class="info-icons">
+            <i class="mdi mdi-account"></i>
+            <i class="mdi mdi-tag"></i>
+        </div>
+        <div class="row step-1">
+            <div class="col-xs-12">
+                <div class="prof-img" style="background-image: url('https://avatars.githubusercontent.com/u/2362041?v=3')"></div>
+                <p class="title">Please verify and complete a few things.</p>
+            </div>
+            <div class="col-xs-12">
+
+                 
+
+                  <% if(typeof(error) !== 'undefined' && error){ %>
       <div class="alert alert-error">
         <a class="close" data-dismiss="alert" href="#">&times;</a>
         <strong><%= error %></strong>
       </div>
       <% } %>
       <form id='signin_form' class='form-horizontal' action='/signin' method='post'>
-        <div class='control-group'>
-          <label class='control-label' for='name'>用户名</label>
+      
 
-          <div class='controls'>
-            <input class='input-xlarge' id='name' name='name' size='30' type='text'/>
-          </div>
-        </div>
-        <div class='control-group'>
-          <label class='control-label' for='pass'>密码</label>
+                 
+               
+                <div class="single-form-container">
+                    <label>name</label>
+                    <input type="text" class="profile-edits" id="name" name="name" placeholder="Grab a unique username at devmag.io"/>
+                    <i class="error-icon mdi mdi-alert"></i>
+                    <i class="processing-icon mdi mdi-refresh"></i>
+                    <i class="status-icon mdi mdi-check"></i>
+                    <i class="status-icon mdi mdi-close"></i>
+                    <p class="error-message">Select a username</p>
+                </div>
+                 <div class="single-form-container">
+                    <label>pass</label>
+                    <input type="text" class="profile-edits" id="pass" name="pass" placeholder="Enter your name" value=""/>
+                    <i class="error-icon mdi mdi-alert"></i>
+                    <p class="error-message">Please enter your name</p>
+                </div>
+                <input type='hidden' name='_csrf' value='<%= csrf %>'/>
 
-          <div class='controls'>
-            <input class='input-xlarge' id='pass' name='pass' size='30' type='password'/>
-          </div>
+                <div class="single-form-container">
+                    <label>Tagline <small>Optional</small></label>
+                    <input type="text" class="profile-edits" id="tagline-picker" placeholder="Enter something cool here / Your current job title"/>
+                </div>
+                <a href="javascript:void(0)"  onclick="$(this).closest('form').submit()" class="onboarding-next next-button next-1"><i class="mdi mdi-arrow-right"></i></a>
+            </div>
+            </form>
         </div>
-        <input type='hidden' name='_csrf' value='<%= csrf %>'/>
-
-        <div class='form-actions'>
-          <input type='submit' class='span-primary' value='登录'/>
-          <a href="/auth/github">
-            <span class="span-info">
-              通过 GitHub 登录
-            </span>
-          </a>
-          <a id="forgot_password" href='/search_pass'>忘记密码了?</a>
+        <div class="row step-2">
+            <div class="col-xs-12">
+                <p class="icon-holder"><i class="mdi mdi-tag-faces"></i></p>
+                <p class="title">What are you interested in?</p>
+                <div class="tags-cloud">
+                    
+                        <a href="#" data-tag="javascript">#javascript</a>
+                    
+                        <a href="#" data-tag="programming">#programming</a>
+                    
+                        <a href="#" data-tag="nodejs">#nodejs</a>
+                    
+                        <a href="#" data-tag="reactjs">#reactjs</a>
+                    
+                        <a href="#" data-tag="css">#css</a>
+                    
+                        <a href="#" data-tag="angularjs">#angularjs</a>
+                    
+                        <a href="#" data-tag="css3">#css3</a>
+                    
+                        <a href="#" data-tag="mongodb">#mongodb</a>
+                    
+                        <a href="#" data-tag="angular">#angular</a>
+                    
+                        <a href="#" data-tag="java">#java</a>
+                    
+                        <a href="#" data-tag="python">#python</a>
+                    
+                        <a href="#" data-tag="html5">#html5</a>
+                    
+                        <a href="#" data-tag="web development">#web development</a>
+                    
+                        <a href="#" data-tag="ux">#ux</a>
+                    
+                        <a href="#" data-tag="frontend">#frontend</a>
+                    
+                        <a href="#" data-tag="es6">#es6</a>
+                    
+                        <a href="#" data-tag="redis">#redis</a>
+                    
+                        <a href="#" data-tag="meteor">#meteor</a>
+                    
+                        <a href="#" data-tag="php">#php</a>
+                    
+                        <a href="#" data-tag="react">#react</a>
+                    
+                        <a href="#" data-tag="github">#github</a>
+                    
+                        <a href="#" data-tag="angular 2">#angular 2</a>
+                    
+                        <a href="#" data-tag="web design">#web design</a>
+                    
+                        <a href="#" data-tag="ionic framework">#ionic framework</a>
+                    
+                        <a href="#" data-tag="ruby">#ruby</a>
+                    
+                </div>
+                <a href="#" class="next-button" id="onboard-finish"><i class="mdi mdi-check"></i></a>
+            </div>
         </div>
-      </form>
     </div>
-  </div>
 </div>
+
+<script src="/built/devmag-welcome.min.js?v=1.71"></script>
+
+<script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-58585635-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+
+
+
+<script type="text/javascript">
+    var wizrocket = {event:[], profile:[], account:[], enum:function(e){return '$E_' + e}};
+    wizrocket.account.push({"id": "867-WR9-9K4Z"});
+    (function () {
+        var wzrk = document.createElement('script');
+        wzrk.type = 'text/javascript';
+        wzrk.async = true;
+        wzrk.src = ('https:' == document.location.protocol ? 'https://d2r1yp2w7bby2u.cloudfront.net' : 'http://static.wizrocket.com') + '/js/a.js';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(wzrk, s);
+    })();
+</script>
+
+
+
+</body>
+</html>
+
+ 

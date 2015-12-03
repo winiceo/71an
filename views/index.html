@@ -1,28 +1,586 @@
-<%- partial('sidebar') %>
 
-<div id="content">
-  <div class="panel">
-    <div class="header">
-      <% [['all', '全部'], ['good', '精华']].concat(tabs).forEach(function (pair) {
-        var value = pair[0];
-        var text = pair[1]; %>
-        <a href="<%= value ? '/?tab=' + value : '/' %>"
-          class="topic-tab <%= value === tab ? 'current-tab' : '' %>"><%= text %></a>
-      <% }) %>
+
+<!DOCTYPE html>
+<html lang="en" ng-app="devmag">
+<head>
+    <meta charset="utf-8"/>
+
+    
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="theme-color" content="#546E7A"/>
+    <title>七一岸</title>
+    <meta name="description" content="71an.com ,采集,推荐,个人收藏,发现好站"/>
+    <link rel="canonical" href="http://71an.com"/>
+
+     
+    
+    <%- Loader('/public/devmag.min.css')
+.css('http://fonts.useso.com/css?family=Roboto:400,300,500,700,400italic')
+.css('/public/css/devmag.min.css')
+ .done(assets, config.site_static_host, config.mini_assets)
+%>
+
+      <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+     
+    <style>
+    .ok p{
+
+        bottom: 15px;
+        left: 15px;
+        font-size: 20px;
+        color: #FFF;
+        font-weight: 400;
+        z-index: 20;
+    }
+    </style>
+</head>
+<body>
+
+
+<div class="primary-bar container-fluid">
+    <div class="row">
+        <div class="container">
+            <div class="row">
+              <ul class="pull-left list-inline login-list">
+                        <li class=" ok">
+                            <p><a href="/">七一岸</a></p>
+                        </li>
+                         
+                    </ul>
+                
+            </div>
+        </div>
     </div>
-    <% if (typeof(topics) !== 'undefined' && topics.length > 0) { %>
-    <div class="inner no-padding">
-      <%- partial('topic/list', {
-      topics: topics,
-      pages: pages,
-      current_page: current_page,
-      base: '/'
-      }) %>
-    </div>
-    <% } else { %>
-    <div class="inner">
-      <p>无话题</p>
-    </div>
-    <% } %>
-  </div>
 </div>
+ 
+
+<div class="floated-content">
+    <div class="content-area">
+        <div class="container">
+            
+<div class="row post-dialog-container" ng-controller="TopicCreationController">
+    <div class="post-status-bar animated">
+        <a class="close-status-bar-handle"><i class="mdi mdi-close"></i></a>
+        <p><i class="fa fa-check-square animated"></i>Awesome! Post Created <a href="#" class="btn btn-green btn-xs published-post-url">View Post <i class="fa fa-angle-right"></i></a></p>
+        <div class="share-box">
+            <p>Share this post with your friends.</p>
+            <div class="share-social-btn">
+                <ul class="list-inline">
+                    <li><a href="#" ng-click="share($event,'facebook')" class="facebook social-share"><i class="fa fa-facebook"></i> <span>Share</span></a></li>
+                    <li><a href="#" ng-click="share($event,'twitter')" class="twitter social-share"><i class="fa fa-twitter"></i> <span>Tweet</span></a></li>
+                    <li><a href="#" ng-click="share($event,'google')" class="googleplus social-share"><i class="fa fa-google-plus"></i></a></li>
+                    <li><a href="#" ng-click="share($event,'linkedin')" class="linkedin social-share"><i class="fa fa-linkedin"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-10 col-xs-offset-1">
+        <div class="row post-box animated">
+            <div class="user-panel-bar">
+                <div id="current-user-image" class="prof-img" style="background-image: url(https://avatars.githubusercontent.com/u/2362041?v=3)">
+                </div>
+                <h5 class="user-title" ng-if="!topic.isAnonymous">Share something, leven</h5>
+                <h5 class="user-title" ng-if="topic.isAnonymous">Posting as anonymous</h5>
+                <a href ng-click="closeModal()" class="close-post-modal"><i class="mdi mdi-close"></i></a>
+            </div>
+            <div class="form-horizontal form-post-modal">
+                <div class="form-group" ng-class="{'has-error':$error.invalidTitle}">
+                    <!--<label for="title-field" class="col-sm-2 control-label">Title</label>-->
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" ng-focus="$error.invalidTitle=false"  id="title-field" placeholder="Enter a title" ng-model="topic.title"/>
+                        <span id="helpBlockTitle" class="help-block" ng-show="$error.invalidTitle">You must provide a title.</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <!--<label for="description-field" class="col-sm-2 control-label push-down">Description</label>-->
+                    <div class="col-sm-12">
+                        <ul class="list-inline textarea-tabs">
+                            <li>
+                                <a href class="markdown-view" ng-click="previewMode = false" ng-class="{'active':previewMode !== true}">Markdown <i class="fa fa-pencil"></i></a>
+                            </li>
+                            <li>
+                                <a href ng-click="previewMode = true" class="compiled-view" ng-class="{'active':previewMode === true}">Preview <i class="fa fa-eye"></i></a>
+                            </li>
+                        </ul>
+                        <ul class="list-inline textarea-tabs pull-right">
+                            <li>
+                                <a href="#" class="help">Help <i class="mdi mdi-help-circle"></i></a>
+                            </li>
+                        </ul>
+                        <textarea id="description-field" auto-grow ng-show="!previewMode" ng-model="topic.contentMarkdown" ng-trim="false" angular-code-tab class="form-control" placeholder="Describe your post, put code snippets and more."></textarea>
+                        <div class="compiled-view-area" ng-show="previewMode">
+                            <div class="no-text-preview" ng-show="!topic.contentMarkdown">No content to preview.</div>
+                            <div class="text-preview" ng-show="topic.contentMarkdown" ng-bind-html="topic.content"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group post-categories">
+                    <div class="col-sm-12">
+                        <ul class="list-inline post-categories-list">
+                            <li>
+                                <a href ng-click="topic.type='link'" class="link-category"><i class="mdi mdi-link-variant"></i> Add link to share</a>
+                            </li>
+                            <li>
+                                <a href ng-click="topic.type='poll'" class="poll-category"><i class="mdi mdi-poll-box"></i> Add poll options</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="form-group link-options hidden-options animated" ng-class="{'has-error':$error.invalidURL}" ng-show="topic.type==='link'">
+                    <!--<label for="url-field" class="col-sm-2 control-label">URL</label>-->
+                    <div class="col-sm-12">
+                        <div class="input-wrapper">
+                            <a href ng-click="removeImage()" ng-show="imageStatus==='fetched'" class="link-preview-cancel"><i class="fa fa-times-circle"></i></a>
+                            <input type="text" class="form-control" ng-disabled="imageStatus === 'fetched'" ng-model="topic.url" ng-blur="fetchLinkImage()" ng-paste="fetchLinkImage()" ng-focus="$error.invalidURL=false" id="url-field" placeholder="http://"  />
+                        </div>
+                        <p class="help-block"><span class="pull-right"><i class="fa fa-spin fa-spinner" ng-show="imageStatus==='fetching' || titleFetch === 'fetching'"></i></span> <a href ng-click="fetchTitle()" class="btn btn-xs btn-default pull-left">Suggest title</a></p>
+                        <span id="helpBlockLink" class="help-block" ng-show="$error.invalidURL">Ooho.That's not a valid URL.</span>
+                        <div class="url-image-preview" ng-show="imageStatus==='fetched'">
+                            <img ng-src="{{featuredImage}}" ng-show="featuredImage" class="img-responsive"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group poll-message" ng-show="topic.type==='poll'">
+                    <div class="row">
+                        <div class="col-xs-10 col-xs-offset-2">
+                            <p>Add upto 4 poll options.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group poll-options-singleton hidden-options animated" ng-class="{'has-error':$error.invalidPoll === true}" ng-show="topic.type==='poll'" ng-repeat="option in topic.pollQuestions">
+                    <label for="option-1" class="col-sm-2 control-label">Option {{$index+1}}</label>
+                    <div class="col-sm-10">
+                        <i class="fa fa-circle-o"></i>
+                        <input type="text" class="form-control" ng-focus="$parent.$error.invalidPoll=false" placeholder="Option {{$index+1}}" ng-model="option.question" />
+                    </div>
+                </div>
+
+                <span id="helpBlockPoll" class="help-block" ng-show="$error.invalidPoll">You must provide atleast 2 options.</span>
+
+                <div class="form-group">
+                    <!--<label for="tags-field" class="col-sm-2 control-label">Tags</label>-->
+                    <div class="col-sm-12">
+                        <div auto-complete url="/utils/showTagSuggestions" id="tags-field" model="topic.tags" ></div>
+                    </div>
+                </div>
+
+                <div class="form-group btn-group-bottom">
+                    <div class="col-sm-12">
+                        <div class="pull-right anonymous-check">
+                            <div class="checkbox">
+                                <label for="anonymous-checkbox" data-toggle="tooltip" data-placement="bottom" title="Posting as anonymous will remove your profile information from this post. Also, you will not receive any credits for upvotes.">
+                                    <input id="anonymous-checkbox" type="checkbox" ng-model="topic.isAnonymous" /><i ng-class="{true:'mdi mdi-checkbox-marked-circle', false:'mdi mdi-checkbox-blank-circle-outline'}[topic.isAnonymous]"></i> Post as anonymous
+                                </label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-green publish-post" ng-click="submit()">Post</button>
+                        <span class="publish-status" ng-show="publishing">Publishing.. <i class="fa fa-spin fa-spinner"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div class="row main-content-area">
+                <main>
+                    <div class="col-xs-12 col-md-8 left-side feed-list">
+                    
+                          <%- partial('topic/list',{topics:topics}) %>
+                        
+                        
+                        
+                        
+                         
+
+
+                        <div id="newTopicsMountPoint"></div>
+
+                        
+                        <div class="row">
+                            <div class="col-xs-12 single-thread text-center loadMoreContainer">
+                                <a href="#" class="loadMore" id="loadMoreBtn">
+                                    <span class="toggleThis">Load More</span>
+                                    <span class="toggleThis spinner"><i class="fa fa-spinner fa-spin fa-fw"></i> Fetching..</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+
+                        <div id="no-more-posts" class="row welcome-card-row" style="display: none;">
+                            <div class="col-xs-12 single-thread welcome-thread">
+                                <a href="#" class="close-card"><i class="mdi mdi-close"></i></a>
+                                <h1><i class="mdi mdi-view-dashboard"></i></h1>
+                                <h2 class="no-thread-message">Looks like we don't have more posts to show.</h2>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </main>
+                <!-- Sidebar Template -->
+                <aside>
+                    <div class="col-md-4 hidden-xs hidden-sm right-side">
+
+    <div class="sidebar-widget hiring-widget">
+        <a href="#">
+            <div class="hiring-header">
+                <div class="div-cover"></div>
+                <p>七一岸</p>
+                <i class="go-icon mdi mdi-arrow-right"></i>
+            </div>
+            <div class="hiring-body">
+                <p>成长是憧憬和怀念的天平，当它倾斜得颓然倒下时，那些失去了月光的夜晚该用怎样的声音去抚慰。</p>
+            </div>
+        </a>
+    </div>
+
+    
+    
+    
+
+     
+</div>
+
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="display:none" id="internals">
+    <input type="text" value="home" id="type"/>
+    <input type="text" value="" id="writeAnswer"/>
+    <input type="text" value="featured" id="category"/>
+    <input type="text" value="" id="tag"/>
+    <input type="text" value="[&quot;2114&quot;,&quot;2101&quot;,&quot;2109&quot;,&quot;2099&quot;,&quot;2096&quot;,&quot;2059&quot;,&quot;2078&quot;,&quot;2080&quot;,&quot;1393&quot;,&quot;2070&quot;,&quot;2050&quot;,&quot;2035&quot;,&quot;1867&quot;,&quot;2053&quot;,&quot;2032&quot;,&quot;2049&quot;,&quot;1969&quot;,&quot;2026&quot;,&quot;1988&quot;,&quot;1992&quot;,&quot;2010&quot;,&quot;1946&quot;,&quot;1973&quot;,&quot;1791&quot;,&quot;892&quot;]" id="topicIds"/>
+</div>
+
+<!-- Modals -->
+<div class="login">
+    <div class="login-wrapper"></div>
+    <div login-modal></div>
+</div>
+
+<div signup-finish-modal></div>
+
+<div class="file-upload-modal">
+    <div class="file-upload-header">
+        <a class="btn btn-default btn-sm pull-right cancel-btn">Cancel</a>
+        <a class="btn btn-default btn-sm pull-right crop-save-btn">Crop &amp; Save</a>
+        <h3 id="upload-image">Upload Image <i class="fa fa-camera"></i></h3>
+    </div>
+    <div class="file-upload-container">
+        <div class="no-image-uploaded">
+            <input type="file" accept="image/*" class="hide" id="hiddenUploadInput" value="Select Image">
+            <a href class="btn btn-default upload-btn"><i class="fa fa-upload"></i> Select File</a>
+        </div>
+        <div class="image-uploaded">
+            <img class="img-responsive"/>
+        </div>
+    </div>
+</div>
+
+<div class="poll-modal-container">
+    <div class="poll-backdrop"></div>
+    <div class="poll-results-modal">
+        <div class="poll-modal-header">
+            <a href="#" class="close-modal-button material-button pull-right">Done</a>
+            <p>Poll Results</p>
+        </div>
+        <div class="poll-modal-body">
+            <!--<a href="#" class="poll-creator-pic" style="background-image: url('https://avatars.githubusercontent.com/u/84222?v=3')"></a>-->
+            <p id="poll-main-title" class="poll-main-title"></p>
+            <p class="poll-data">Created by <span id="poll-creator-info"></span> <span id="poll-date-count"></span></p>
+            <div id="poll-modal-options" class="poll-modal-options"></div>
+        </div>
+    </div>
+</div>
+
+<div class="upvoted-people-modal">
+    <div class="upm-container">
+        <div class="upm-header">
+            <a href="#" class="upm-done-btn"><i class="mdi mdi-close"></i></a>
+            <p>Post Activity</p>
+        </div>
+        <div class="upm-content">
+        </div>
+    </div>
+</div>
+
+<div class="global-error-notification hidden-xs hidden-sm">
+    <i class="mdi mdi-close-circle"></i>
+    <p>You have used all the credits. You can earn more credits by participating in discussions. <a target="_blank" href="http://blog.devmag.io/2015/06/25/credits">Learn more.</a></p>
+</div>
+
+
+
+<div class="alert-xprs wrapper">
+    <div class="alert-content success animated">
+        <a href="#" class="dismiss"><i class="fa fa-times"></i></a>
+        <div class="row">
+            <div class="col-xs-4">
+                <div class="icon-div">
+                    <i class="fa fa-check-square animated"></i>
+                </div>
+            </div>
+            <div class="col-xs-8">
+                <h3 id="title">Awesome</h3>
+                <p><span id="subtitle">Your post has been created.</span> <a id="link" href="#">View post</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="transparent-wrapper slideout-notification-wrapper">
+    <div class="slideout-menu slideout-right animated">
+        <div class="slideout-header">
+            <a href="#" class="close-notification-center"><i class="mdi mdi-close"></i></a>
+            <h3><i class="fa fa-bolt"></i> Notification Center</h3>
+        </div>
+        <div class="slideout-area-menu">
+            <ul class="list-inline">
+                <li>
+                    <a href="#" class="mark-all-as-read">Mark all read</a>
+                </li>
+                <li>
+                    <a href="#" class="clear-all">Clear all</a>
+                </li>
+            </ul>
+        </div>
+        <div class="slideout-body">
+            <div class="no-notification-content" style="display:none">
+                <p>No new notifications for now.<br/>Participate in community, share knowledge and follow other developers to start receiving notifications.</p>
+            </div>
+            <div class="fill-notifications">
+                <ul class="list-unstyled notification-list-items"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="feedback-modal animated">
+    <div class="form-container feedback-modal-inner-div">
+        <h3><i class="mdi mdi-bug"></i> Report Bug</h3>
+        <form>
+            <div class="form-group">
+                <label for="messageBox" class="control-label">Please describe the problem : </label>
+                <textarea id="messageBox" class="form-control feedback-message"></textarea>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="autoScreenshot" checked> Automatically include a screenshot of your current page.
+                </label>
+            </div>
+            <div class="form-group">
+                <button type="submit" id="submit-bug-report" class="btn btn-default">Submit</button>
+                <button type="submit" class="btn btn-link report_close">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="feedback-modal-status animated">
+    <h3><i class="mdi  mdi-check"></i> Thanks for your feedback! <button type="submit" id="feedback-ok-button" class="btn btn-default">Ok</button></h3>
+</div>
+
+<div class="delete-confirm-modal animated">
+    <h3>Are you sure you want to delete this?</h3>
+    <a href="#" class="btn btn-danger">Yes</a> <a href="#" class="btn btn-grey">No</a>
+</div>
+
+<!-- 
+<a href="#" class="report_bug_handle hidden-xs hidden-sm"><i class="mdi mdi-bug"></i> Report Bug</a>
+
+ -->
+<div class="report_cover"></div>
+
+
+
+<div class="profile-completion-modal animated">
+    <div class="container-fluid">
+        <p class="pcm-steps">Step <span id="step-count"></span>/3</p>
+        <a href="#" class="pcm-skip-link">Close</a>
+        <div class="pcm-image" style="background-image: url('https://avatars.githubusercontent.com/u/2362041?v=3')">
+        </div>
+        <p class="pcm-heading">Hi, leven</p>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <p class="pcm-message">Your profile is your identity at devmag.io. Let's make it shine.</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="pcm-container">
+                    <div class="pcm-form pcm-form-1">
+                        <label for="taglineField" class="pcm-label">Add a tagline</label>
+                        <input class="pcm-field" id="taglineField" type="text" value="71an.com" />
+                        <a href="#" class="submitTagline btn btn-pcm-default" id="next-1">Next <i class="mdi mdi-arrow-right-bold-circle"></i></a>
+                    </div>
+                    <div class="pcm-form pcm-form-2">
+                        <label for="aboutField" class="pcm-label">A few lines about yourself.</label>
+                        <textarea class="pcm-field" id="aboutField" placeholder="Tell us what you do and what you are good at"></textarea>
+                        <a href="#" class="btn btn-pcm-default btn-pcm-back" id="back-2"><i class="mdi mdi-arrow-left-bold-circle"></i> Back</a>
+                        <a href="#" class="submitBio btn btn-pcm-default" id="next-2">Next <i class="mdi mdi-arrow-right-bold-circle"></i></a>
+                    </div>
+                    <div class="pcm-form pcm-form-3">
+                        <label for="websiteField" class="pcm-label">Your website</label>
+                        <input class="pcm-field" id="websiteField" type="text" value="" placeholder="http://"/>
+                        <a href="#" class="btn btn-pcm-default btn-pcm-back" id="back-3"><i class="mdi mdi-arrow-left-bold-circle"></i> Back</a>
+                        <a href="#" class="submitWebsite btn btn-pcm-default">Done</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="ask-to-answer-modal">
+    <div class="ask-modal">
+        <div class="ask-header">
+            <a href="#" class="close-ask-modal"><i class="mdi mdi-close"></i></a>
+            <p>Invite People to Participate</p>
+        </div>
+        <div class="ask-body">
+            <div class="col-sm-2">
+                <ul class="list-unstyled vertical-tabs">
+                    <li>
+                        <a href="#" class="active twitter-tab"><i class="fa fa-twitter"></i></a>
+                    </li>
+                    <li>
+                        <a href="#" class="devmagio-tab">
+                            <img src="/images/favicons/favicon-96x96.png"/>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-sm-10">
+                <div class="ask-body-content">
+
+                    <div class="content-for-twitter">
+                        <div class="step-1">
+                            <p>Know somebody on Twitter who can answer this question or participate in this discussion?</p>
+                            <p><img src="/images/twitter-face.png" class="twitter-face"/></p>
+                            <div class="form-group twitter-username-area">
+                                <label class="sr-only" for="user-handle">Enter Twitter Handle</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">@</div>
+                                    <input type="text" class="form-control" data-toggle="tooltip" data-placement="bottom" data-trigger="manual" title="We didn't find anyone with that username on Twitter." id="user-handle" placeholder="Enter Twitter Handle">
+                                </div>
+                            </div>
+                            <a href="#" id="invite-btn-1" class="ask-button ask-button-1">Next <i class="mdi mdi-arrow-right-bold-circle"></i></a>
+                        </div>
+                        <div class="step-2">
+                            <p>Tweet Preview</p>
+                            <p><small>Edit and confirm your Tweet. Don't insert the link, we will do it automatically. </small></p>
+                            <textarea id="tweet-text" class="tweet-text" placeholder="Enter Text"></textarea>
+                            <div class="asked-to-profile">
+                                <a href="#" class="edit-twitter-handle"><i class="mdi mdi-pencil"></i></a>
+                                <a href="#" class="twitter-profile-preview">
+                                    <img src="" id="lookup-preview-image"/>
+                                    <h3><span id="lookup-preview-name"></span> <small id="lookup-preview-username"></small></h3>
+                                </a>
+                            </div>
+                            <div id="character-count" class="character-count"></div>
+                            <a href="#" id="invite-btn-2" class="ask-button tweet-button">Tweet <i class="fa fa-twitter"></i></a>
+                        </div>
+                        <div class="step-3">
+                            <p>Connect with Twitter</p>
+                            <p><small>This is a one time process. We won't Tweet anything without your permission.</small></p>
+                            <a href="#" id="invite-btn-3" class="ask-button connect-button">Connect & Tweet <i class="fa fa-twitter"></i></a>
+                        </div>
+                        <div class="step-4">
+                            <h3 class="tweet-success-message"><i class="mdi mdi-checkbox-marked-circle"></i> Tweeted Successfully.</h3>
+                            <a href="#" id="invite-btn-4" class="invite-another">Invite another person</a>
+                        </div>
+                    </div>
+
+                    <div class="content-for-devmagio">
+                        <p>Invite Someone from devmag.io.</p>
+                        <p><small>Search any devmag.io user: </small></p>
+                        <input id="inviteSuggestionsInput" type="text" class="form-control" placeholder="Search Name"/>
+                        <div id="invite-search-results" class="row invite-search-results"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="user-login-modal">
+    <div class="login-container">
+        <div class="header-login-modal">
+            <a href="#" class="close-login-modal"><i class="mdi mdi-close"></i></a>
+            <p>Login or Sign up</p>
+            <div class="info-icons">
+                <i class="mdi mdi-clipboard-account"></i>
+                <i class="mdi mdi-lock lock-icon"></i>
+            </div>
+        </div>
+        <div class="content-login-modal">
+            <div class="pre-login" id="pre-login">
+                <p>Connect with one of the following accounts</p>
+                <div class="login-btns-container">
+                    <a href="#" id="github" class="github social-signin-btn">Github <i class="mdi mdi-github-circle"></i></a>
+                    <a href="#" id="linkedin" class="linkedin social-signin-btn">LinkedIn <i class="mdi mdi-linkedin"></i></a>
+                    <a href="#" id="google" class="google-plus social-signin-btn">Google+ <i class="mdi mdi-google-plus"></i></a>
+                    <a href="#" id="facebook" class="facebook social-signin-btn">Facebook <i class="mdi mdi-facebook"></i></a>
+                </div>
+                <p class="info-message">We don't request write access from the above services. Hence, we can never publish anything without your consent.</p>
+                <p class="info-message">By joining devmag.io you accept our <a href="/tos.html" target="_blank">Terms of Service</a>.</p>
+            </div>
+            <div class="while-login" id="while-login">
+                <p><i class="mdi mdi-refresh processing-icon"></i></p>
+                <p class="talking">Connecting with LinkedIn ... </p>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="username-internal" value="leven"/>
+<input type="hidden" id="first-time-login" value=""/>
+
+<div class="slideout-wrapper">
+    <div class="slideout-helper animated">
+        <div class="loadingAnimation markdown-help-preloader">
+            <p><i class="fa fa-refresh fa-spin"></i> One moment please..</p>
+        </div>
+        <div class="markdown-content">
+        </div>
+    </div>
+</div>
+
+
+ 
+
+
+<!-- scripts -->
+  <%- Loader('/public/devmag.js')
+  .js('/public/devmag.min.js')
+     .done(assets, config.site_static_host, config.mini_assets)
+  %>
+ 
+
+
+
+
+</body>
+</html>

@@ -8,6 +8,7 @@ var _         = require('lodash');
 var TopicSchema = new Schema({
   title: { type: String },
   content: { type: String },
+  contentMarkdown:{type:String},
   author_id: { type: ObjectId },
   top: { type: Boolean, default: false }, // 置顶帖
   good: {type: Boolean, default: false}, // 精华帖
@@ -20,7 +21,7 @@ var TopicSchema = new Schema({
   last_reply: { type: ObjectId },
   last_reply_at: { type: Date, default: Date.now },
   content_is_html: { type: Boolean },
-  tab: {type: String},
+  type: {type: String},
   deleted: {type: Boolean, default: false},
 });
 
