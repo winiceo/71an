@@ -29,7 +29,7 @@ exports.index = function (req, res, next) {
   // 取主题
   var query = {};
    
-  if(tags!=undefined) {
+  if(tags!="undefined"&&tags) {
     query['keywords']=new RegExp(tags);//模糊查询参数
   }
 
@@ -47,7 +47,7 @@ exports.index = function (req, res, next) {
     } else {
       Article.find(query, {}, options, function (err, topics) {
         cache.set(pagesCacheKey, topics, 60 * 1);
-        proxy.emit('pages', pages);
+        proxy.emit('pages', topics);
       
       })
        
@@ -81,7 +81,7 @@ exports.loadmore = function (req, res, next) {
  // 取主题
   var query = {};
    
-  if(tags!=undefined) {
+  if(tags!="undefined"&&tags) {
     query['keywords']=new RegExp(tags);//模糊查询参数
   }
   
@@ -98,7 +98,7 @@ exports.loadmore = function (req, res, next) {
     } else {
       Article.find(query, {}, options, function (err, topics) {
         cache.set(pagesCacheKey, topics, 60 * 1);
-        proxy.emit('ajaxpages', pages);
+        proxy.emit('ajaxpages', topics);
       
       })
        
@@ -146,7 +146,7 @@ exports.read = function (req, res, next) {
            if(topic){
             var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
             cache.set(readid, topic2, 60 * 1);
-            proxy.emit('readid', pages);
+            proxy.emit('readid', topic2);
           }else{
             return res.status(403).send('主题不存在');
           }
