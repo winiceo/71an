@@ -29,16 +29,37 @@ exports.index = function (req, res, next) {
   // 取主题
   var query = {};
    
-  if(tags) {
+  if(tags!=undefined) {
     query['keywords']=new RegExp(tags);//模糊查询参数
   }
 
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
+ 
 
-  Article.find(query, {}, options, function (err, topics) {
-      res.render('index',{topics:topics,tags:tags}) 
-  })
+  
+// 取分页数据
+  var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
+  cache.get(pagesCacheKey, proxy.done(function (pages) {
+
+    if (pages) {
+      proxy.emit('pages', pages);
+    } else {
+      Article.find(query, {}, options, function (err, topics) {
+        cache.set(pagesCacheKey, topics, 60 * 1);
+        proxy.emit('pages', pages);
+      
+      })
+       
+    }
+  }));
+  proxy.all('pages',
+    function ( pages) {
+      res.render('index',{topics:pages,tags:tags}) 
+       
+    });
+  
+  
   
    
     
@@ -60,7 +81,7 @@ exports.loadmore = function (req, res, next) {
  // 取主题
   var query = {};
    
-  if(tags) {
+  if(tags!=undefined) {
     query['keywords']=new RegExp(tags);//模糊查询参数
   }
   
@@ -68,11 +89,26 @@ exports.loadmore = function (req, res, next) {
 
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
-
-  Article.find(query,{},options ,function (err, topics) {
-     res.json({topics:topics}) 
-  })
-     
+// 取分页数据
+  var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
+  cache.get(pagesCacheKey, proxy.done(function (pages) {
+    
+    if (pages) {
+      proxy.emit('ajaxpages', pages);
+    } else {
+      Article.find(query, {}, options, function (err, topics) {
+        cache.set(pagesCacheKey, topics, 60 * 1);
+        proxy.emit('ajaxpages', pages);
+      
+      })
+       
+    }
+  }));
+  proxy.all('ajaxpages',
+    function ( pages) {
+      res.json({topics:pages}) 
+       
+    }); 
   
   
 };
