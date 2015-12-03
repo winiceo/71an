@@ -1,0 +1,102 @@
+<%
+
+var monthNames = ["January", "February", "March","April", "May", "June", "July", "August", "September","October", "November", "December"];
+
+function formatDate(date){
+    var day = date.getDate();
+    var month = date.getMonth();
+    var year = date.getFullYear().toString().substring(2);
+    return monthNames[month]+' '+day+"'"+year;
+}
+
+var helpers={
+
+    notifIcon: function(type) {
+        var faClassName='';
+        switch(type){
+            case 'reply':
+                faClassName='mdi-reply';
+                break;
+            case 'comment':
+                faClassName='mdi-message-reply';
+                break;
+            case 'follow':
+                faClassName='mdi-plus-circle';
+                break;
+            case 'mentioned':
+                faClassName='mdi-at';
+                break;
+            case 'post.upvote':
+            case 'comment.upvote':
+                faClassName='mdi-arrow-up-bold';
+                break;
+            case 'invite':
+                faClassName='mdi-email-open';
+                break;
+            case 'announcement':
+                faClassName='mdi-bullhorn';
+                break;
+        }
+        return faClassName;
+    },
+    fromNow : function(date){
+        var elapsed = ((Math.abs(new Date().getTime() - new Date(date).getTime()))/1000/60).toFixed(0);
+        return elapsed <=60 ? elapsed+' mins ago' : formatDate(new Date(date));
+    }
+}
+%>
+<% for(var i=0;i<notifs.length;i++) {%>
+    <li class="notification-li <%= notifs[i].type === 'follow' ? ' noop' : '' %>">
+
+        <% if(notifs[i].type !== 'follow') {  %>
+
+        <a href="#" data-link="<%= notifs[i].link %>" data-notification-ids="<%= notifs[i].notificationIds %>" data-read="<%= notifs[i].readBy.indexOf(username) === -1 ? false : true %>" class="single-notification <%= notifs[i].type === 'announcement' ? 'system-notif' : '' %> <%= notifs[i].readBy.indexOf(username) === -1 ? 'unread' : '' %>">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-1 col-xs-2">
+                        <i class="mdi <%= helpers.notifIcon(notifs[i].type) %>"></i>
+                    </div>
+                    <div class="col-md-11 col-xs-10">
+                        <% if(notifs[i].type === 'announcement') {%>
+                            <p>
+                                <%= notifs[i].message %>
+                            </p>
+                        <% } else { %>
+                        <p>
+                            <span class="username-wrapper">@<%= notifs[i].from %></span>
+                            <span class="username-wrapper"> <%= notifs[i].others %></span>
+                            <%= notifs[i].message %>
+                        </p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </a>
+        <% } else { %>
+        <div data-link="<%= notifs[i].link %>" data-notification-ids="<%= notifs[i].notificationIds %>" data-read="<%= notifs[i].readBy.indexOf(username) === -1 ? false : true %>" class="single-notification <%= notifs[i].type === 'announcement' ? 'system-notif' : '' %> <%= notifs[i].readBy.indexOf(username) === -1 ? 'unread' : '' %>">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-1 col-xs-2">
+                        <i class="mdi <%= helpers.notifIcon(notifs[i].type) %>"></i>
+                    </div>
+                    <div class="col-md-11 col-xs-10">
+                        <p>
+                            <span class="username-wrapper">@<%= notifs[i].from %></span>
+                            <span class="username-wrapper"><%= notifs[i].others %></span> followed you
+                        </p>
+                        <ul class="list-inline users-list">
+                            <% for(var j=0;j<notifs[i].followers.length;j++) {  %>
+                            <li>
+                               <a href="/@<%= notifs[i].followers[j] %>" class="follower-image" data-href="/@<%= notifs[i].followers[j] %>" style="background-image: url('/utils/user-image/<%= notifs[i].followers[j] %>')">
+                                    <!--<img data-href="/@<%= notifs[i].followers[j] %>" class="follower-image" src="/utils/user-image/<%= notifs[i].followers[j] %>" />-->
+                               </a>
+                            </li>
+                            <%}%>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+    </li>
+<% } %>

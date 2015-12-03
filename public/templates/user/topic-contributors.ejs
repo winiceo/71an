@@ -1,0 +1,17 @@
+<% for(var i=0;i<3;i++){%>
+    <% if(users[i]) {%>
+        <li>
+            <a href="<%= users[i].type === 'Commented' ? '/post/'+users[i].topicId+'#'+users[i].commentId : '/@'+users[i].username %>" class="voter-profile-pic" style="background-image: url('<%= users[i].photo %>')" data-toggle="tooltip" data-placement="bottom" title="<%= users[i].name+' - '+users[i].type %>">
+                <% if(users[i].type === 'Commented') {%>
+                    <i class="mdi mdi-message-reply comment-contrib-icon"></i>
+                <% } %>
+            </a>
+        </li>
+    <% } %>
+<% } %>
+
+<% if(users.length > 3) {%>
+    <li>
+        <a href="#" class="more-voters-link"> <%= users.length-3 %> more</a>
+    </li>
+<% } %>

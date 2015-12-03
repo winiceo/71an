@@ -81,6 +81,8 @@ if (config.debug) {
 if (config.debug) {
   app.use(LoaderConnect.less(__dirname)); // 测试环境用，编译 .less on the fly
 }
+app.use('/', express.static(staticDir));
+
 app.use('/public', express.static(staticDir));
 app.use('/agent', proxyMiddleware.proxy);
 

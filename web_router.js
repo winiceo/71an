@@ -32,6 +32,10 @@ router.get('/', site.index);
 router.get('/ajax/topics', site.loadmore);
 router.get('/weixin/read/:id', site.read);
 router.get('/tags/:tag', site.index);
+ 
+router.get('/utils/fetch-collections',site.collections);
+router.post('/utils/fetch-contributors',site.contributors);
+router.get('/notifications',site.notifications);
 // // sitemap
 // router.get('/sitemap.xml', site.sitemap);
 // // mobile app download

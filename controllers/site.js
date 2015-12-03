@@ -112,6 +112,19 @@ exports.loadmore = function (req, res, next) {
   
   
 };
+exports.collections=function(req,res,next){
+  var data='{"data":[{"_id":214,"name":"71an","slug":"71an","owner":"leven","description":"","color":"#FFC107","__v":0,"items":[],"dateCreated":"2015-12-01T11:06:21.751Z","type":"public"}]}';
+  return res.json(JSON.parse(data))
+};
+exports.contributors=function(req,res,next){
+  var data='{"data":[{"_id":214,"name":"71an","slug":"71an","owner":"leven","description":"","color":"#FFC107","__v":0,"items":[],"dateCreated":"2015-12-01T11:06:21.751Z","type":"public"}]}';
+  return res.json(JSON.parse(data))
+};
+
+exports.notifications=function(req,res,next){
+  var data=[];
+  return res.json(data)
+};
  
 //阅读
 exports.read = function (req, res, next) {
@@ -145,7 +158,7 @@ exports.read = function (req, res, next) {
            var topic=topic[0];
            if(topic){
             var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
-            cache.set(readid, topic2, 3600 * 1);
+            cache.set(readid, topic2, 3600 * 7);
             proxy.emit('readid', topic2);
           }else{
             return res.status(403).send('主题不存在');
