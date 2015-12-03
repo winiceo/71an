@@ -81,14 +81,14 @@ var helpers={
                     <div class="col-sm-10 col-xs-8 headers-col">
                         
                         <div class="profile-img-col hidden-xs">
-                           <a href="/weixin/read/<%=topics[j]._id%>">  <%=topics[j].title%></a>
+                           <a href="/weixin/read/<%=topics[j]._id%>" target="_blank">  <%=topics[j].title%><br><%=topics[j].keywords%></a>
                         </div>
                         <p class="header-text-content  ">
                              
                         
                     </div>
                     <div class="col-sm-2  col-xs-4 headers-col extra-col text-right">
-                        <a class="topic-icon-placeholder  " href="/post/<%=topics[j]._id + '/'+ topics[j].title %>">
+                        <a class="topic-icon-placeholder  " href="/post/<%=topics[j]._id + '/'+ topics[j].title %>" target="_blank">
                             <i class="mdi  "></i>
                         </a>
                     </div>
@@ -118,7 +118,7 @@ var helpers={
                             
                             <% for(var i=0; i < topics[j].image_list.length; i++) { %>
 
-                              <a href="/weixin/read/<%=topics[j]._id%>">
+                              <a href="/weixin/read/<%=topics[j]._id%>" target="_blank">
                               <img src="<%=topics[j].image_list[i].url%>">
                               </a>
                             <% } %> 

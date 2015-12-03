@@ -1,65 +1,4 @@
-
-
-<!DOCTYPE html>
-<html lang="en" ng-app="devmag">
-<head>
-    <meta charset="utf-8"/>
-
-    
-
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <meta name="theme-color" content="#546E7A"/>
-    <title>七一岸</title>
-    <meta name="description" content="71an.com ,采集,推荐,个人收藏,发现好站"/>
-    <link rel="canonical" href="http://71an.com"/>
-
-     
-    
-    <%- Loader('/public/devmag.min.css')
-.css('http://fonts.useso.com/css?family=Roboto:400,300,500,700,400italic')
-.css('/public/css/devmag.min.css')
- .done(assets, config.site_static_host, config.mini_assets)
-%>
-
-      <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-     
-    <style>
-    .ok p{
-
-        bottom: 15px;
-        left: 15px;
-        font-size: 20px;
-        color: #FFF;
-        font-weight: 400;
-        z-index: 20;
-    }
-    </style>
-</head>
-<body>
-
-
-<div class="primary-bar container-fluid">
-    <div class="row">
-        <div class="container">
-            <div class="row">
-              <ul class="pull-left list-inline login-list">
-                        <li class=" ok">
-                            <p><a href="/">七一岸</a></p>
-                        </li>
-                         
-                    </ul>
-                
-            </div>
-        </div>
-    </div>
-</div>
  
-
 <div class="floated-content">
     <div class="content-area">
         <div class="container">
@@ -230,30 +169,9 @@
                     </div>
                 </main>
                 <!-- Sidebar Template -->
-                <aside>
-                    <div class="col-md-4 hidden-xs hidden-sm right-side">
+                <%- partial('sidebar') %>
 
-    <div class="sidebar-widget hiring-widget">
-        <a href="#">
-            <div class="hiring-header">
-                <div class="div-cover"></div>
-                <p>七一岸</p>
-                <i class="go-icon mdi mdi-arrow-right"></i>
-            </div>
-            <div class="hiring-body">
-                <p>成长是憧憬和怀念的天平，当它倾斜得颓然倒下时，那些失去了月光的夜晚该用怎样的声音去抚慰。</p>
-            </div>
-        </a>
-    </div>
-
-    
-    
-    
-
-     
-</div>
-
-                </aside>
+               
             </div>
         </div>
     </div>
@@ -263,7 +181,7 @@
     <input type="text" value="home" id="type"/>
     <input type="text" value="" id="writeAnswer"/>
     <input type="text" value="featured" id="category"/>
-    <input type="text" value="" id="tag"/>
+    <input type="text" value="<%= tags %>" id="tag"/>
     <input type="text" value="[&quot;2114&quot;,&quot;2101&quot;,&quot;2109&quot;,&quot;2099&quot;,&quot;2096&quot;,&quot;2059&quot;,&quot;2078&quot;,&quot;2080&quot;,&quot;1393&quot;,&quot;2070&quot;,&quot;2050&quot;,&quot;2035&quot;,&quot;1867&quot;,&quot;2053&quot;,&quot;2032&quot;,&quot;2049&quot;,&quot;1969&quot;,&quot;2026&quot;,&quot;1988&quot;,&quot;1992&quot;,&quot;2010&quot;,&quot;1946&quot;,&quot;1973&quot;,&quot;1791&quot;,&quot;892&quot;]" id="topicIds"/>
 </div>
 
@@ -571,16 +489,4 @@
 
  
 
-
-<!-- scripts -->
-  <%- Loader('/public/devmag.js')
-  .js('/public/devmag.min.js')
-     .done(assets, config.site_static_host, config.mini_assets)
-  %>
  
-
-
-
-
-</body>
-</html>

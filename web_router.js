@@ -31,6 +31,7 @@ var router = express.Router();
 router.get('/', site.index);
 router.get('/ajax/topics', site.loadmore);
 router.get('/weixin/read/:id', site.read);
+router.get('/tags/:tag', site.index);
 // // sitemap
 // router.get('/sitemap.xml', site.sitemap);
 // // mobile app download

@@ -20,7 +20,8 @@ var models     = require('../models');
 var Article      = models.Article;
 var extend = require('util')._extend;
 exports.index = function (req, res, next) {
-   var skip=parseInt(req.query.skip,10)||0;
+  var skip=parseInt(req.query.skip,10)||0;
+  var tags=req.params.tag;
    
   var proxy = new eventproxy();
   proxy.fail(next);
@@ -28,13 +29,17 @@ exports.index = function (req, res, next) {
   // 取主题
   var query = {};
    
+  if(tags) {
+    query['keywords']=new RegExp(tags);//模糊查询参数
+  }
 
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
 
   Article.find(query, {}, options, function (err, topics) {
-      res.render('index',{topics:topics}) 
+      res.render('index',{topics:topics,tags:tags}) 
   })
+  
    
     
 };
@@ -47,12 +52,18 @@ exports.loadmore = function (req, res, next) {
      
 //article.save();
   var skip=parseInt(req.query.skip,10)||25;
-   
+  var tags=req.query.tag;
   var proxy = new eventproxy();
   proxy.fail(next);
 
   // 取主题
+ // 取主题
   var query = {};
+   
+  if(tags) {
+    query['keywords']=new RegExp(tags);//模糊查询参数
+  }
+  
    
 
   var limit = config.list_topic_count;

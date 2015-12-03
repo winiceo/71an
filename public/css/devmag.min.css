@@ -30849,3 +30849,14 @@ a.report_bug_handle:hover {
 	-webkit-animation: pulseWarningIns .75s infinite alternate;
 	animation: pulseWarningIns .75s infinite alternate
 }
+
+
+.ok p{
+
+        bottom: 15px;
+        left: 15px;
+        font-size: 20px;
+        color: #FFF;
+        font-weight: 400;
+        z-index: 20;
+    }
