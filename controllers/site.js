@@ -145,7 +145,7 @@ exports.read = function (req, res, next) {
            var topic=topic[0];
            if(topic){
             var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
-            cache.set(readid, topic2, 60 * 1);
+            cache.set(readid, topic2, 3600 * 1);
             proxy.emit('readid', topic2);
           }else{
             return res.status(403).send('主题不存在');
