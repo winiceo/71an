@@ -119,7 +119,8 @@ exports.read = function (req, res, next) {
      
 //article.save();
   var id= req.params.id;
-   
+   var proxy = new eventproxy();
+  proxy.fail(next);
    
  var query={};
    if( !isNaN( id ) )
@@ -129,23 +130,41 @@ exports.read = function (req, res, next) {
   }else{
       query={"_id":id};
   }
-  Article.find(query, function (err, topic) {
-    if(err){
-      return res.status(403).send('主题不存在');
-    }
-    
+  var readid = JSON.stringify(query);
+  cache.get(readid, proxy.done(function (pages) {
 
-     var topic=topic[0];
-     if(topic){
-      var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
-      
-      res.render('read',{topic:topic2}) 
-    }else{
-      return res.status(403).send('主题不存在');
-    }
+    if (pages) {
+      proxy.emit('readid', pages);
+    } else {
+      Article.find(query, function (err, topic) {
+          if(err){
+            return res.status(403).send('主题不存在');
+          }
+          
+
+           var topic=topic[0];
+           if(topic){
+            var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
+            cache.set(readid, topic2, 60 * 1);
+            proxy.emit('readid', pages);
+          }else{
+            return res.status(403).send('主题不存在');
+          }
     
      
-  })
+      })
+      
+       
+    }
+  }));
+  proxy.all('readid',
+    function ( pages) {
+      res.render('read',{topic:pages}) 
+       
+    });
+
+
+  
      
  
 
