@@ -31,6 +31,7 @@ var router = express.Router();
 router.get('/', site.index);
 router.get('/ajax/topics', site.loadmore);
 router.get('/weixin/read/:id', site.read);
+router.get('/weixin/delete/:id', site.delete);
 router.get('/tags/:tag', site.index);
  
 router.get('/utils/fetch-collections',site.collections);
