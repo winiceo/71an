@@ -15,10 +15,35 @@
     </div>
 
     
-    
+    <div class="sidebar-widget featured-posts-widget">
+        <div class="large-icon">
+            <h3>推荐阅读</h3>
+        </div>
+         
+        <ul class="list-unstyled">
+             <%for(var i=0;i<other.length;i++){%>   
+            
+            <li>
+                <div class="suggested-thread">
+                    <div class="suggested-thread row">
+                        <div class="col-xs-2">
+                            <a class="discussion" href="/weixin/read/<%=other[i]._id%>" target="_blank"><i class="mdi mdi-message-text"></i></a>
+                        </div>
+                        <div class="col-xs-10">
+                            <a href="/weixin/read/<%=other[i]._id%>" target="_blank"><%=other[i].title%><span class="score"><i class="mdi mdi-arrow-up-bold"></i></span></a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+           <%}%> 
+            
+            
+        </ul>
+         <i class="mdi mdi-arrow-right"></i></a>
+    </div>
     
 
      
 </div>
 
-                </aside>
+  </aside>

@@ -38,16 +38,27 @@ exports.index = function (req, res, next) {
  
   
 // 取分页数据
-  var pagesCacheKey =  "pages1"+ JSON.stringify(options);
+  //var pagesCacheKey =  "pages1"+ JSON.stringify(options);
   
   var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
       Article.find(query, fields,options, function (err, topics) {
-        
-        
-         res.render('index',{topics:topics,tags:tags}) 
-        //res.send(pages)
+           
+             var query = {}; 
+
+                var limit = 5;
+                var options = {  limit: limit,sort:{"click_num":-1}};
+               
+                var fields={title:"title",_id:"_id" };
+
+                Article.find(query, fields, options, function (err, other) {
+                   res.render('index',{topics:topics,tags:tags,other:other}) 
+              })
+          
+        //  proxy.emit('other_index', topics);
       
       })
+
+             
   // cache.get(pagesCacheKey, proxy.done(function (pages) {
 
   //   if (pages) {
@@ -65,11 +76,10 @@ exports.index = function (req, res, next) {
        
   //    }
   // }));
-  // proxy.all('page_index',
-  //   function ( pages) {
-  //      var pages=res.render('index',{topics:pages,tags:tags}) 
-  //     res.send(pages)
-  //   }); 
+  proxy.all('page_index',
+    function ( topics) {
+      res.render('index',{topics:topics,tags:tags,other:topics}) 
+    }); 
     
 };
 
@@ -160,12 +170,7 @@ exports.read = function (req, res, next) {
       query={"_id":id};
   }
   var readid = JSON.stringify(query);
-  cache.get(readid, proxy.done(function (pages) {
-
-    if (pages) {
-      proxy.emit('readid', pages);
-    } else {
-      Article.find(query, function (err, topic) {
+  Article.find(query, function (err, topic) {
           if(err){
             return res.status(403).send('主题不存在');
           }
@@ -173,22 +178,70 @@ exports.read = function (req, res, next) {
 
            var topic=topic[0];
            if(topic){
+
+            topic.click_num += 1;
+            topic.save();
+            var keys=topic.keywords.split(",");
             var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
-            cache.set(readid, topic2, 3600 * 7);
+            var other=[]
+            if(keys&&keys.length>0){
+              var query = {};
+         
+         
+              query['keywords']=new RegExp(keys[0]);//模糊查询参数
+         
+        
+         
+
+                var limit = 5;
+                var options = {  limit: limit,sort:{"datetime":-1}};
+               
+                var fields={title:"title",_id:"_id" };
+
+                Article.find(query, fields, options, function (err, topics) {
+                    proxy.emit('other', topics);
+                  
+                  })
+            }
             proxy.emit('readid', topic2);
+             
           }else{
             return res.status(403).send('主题不存在');
           }
     
      
       })
+
+
+  // cache.get(readid, proxy.done(function (pages) {
+
+  //   if (pages) {
+  //     proxy.emit('readid', pages);
+  //   } else {
+  //     Article.find(query, function (err, topic) {
+  //         if(err){
+  //           return res.status(403).send('主题不存在');
+  //         }
+          
+
+  //          var topic=topic[0];
+  //          if(topic){
+  //           var topic2 = extend(topic._doc,{tags:topic.keywords.split(",")});
+  //           cache.set(readid, topic2, 3600 * 7);
+  //           proxy.emit('readid', topic2);
+  //         }else{
+  //           return res.status(403).send('主题不存在');
+  //         }
+    
+     
+  //     })
       
        
-    }
-  }));
-  proxy.all('readid',
-    function ( pages) {
-      res.render('read',{topic:pages}) 
+  //   }
+  // }));
+  proxy.all('readid','other',
+    function ( pages,other) {
+      res.render('read',{topic:pages,other:other}) 
        
     });
 
