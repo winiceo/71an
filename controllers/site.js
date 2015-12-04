@@ -189,7 +189,7 @@ exports.read = function (req, res, next) {
          
          
               query['keywords']=new RegExp(keys[0]);//模糊查询参数
-         
+              query['_id']={"$ne":id}
         
          
 

@@ -30863,3 +30863,6 @@ a.report_bug_handle:hover {
 	margin-bottom: 10px;
 	margin-right: 10px
 }
+.thread-final-content img{
+max-width: 100%;
+}
