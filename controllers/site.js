@@ -56,8 +56,7 @@ exports.index = function (req, res, next) {
   }));
   proxy.all('pages',
     function ( pages) {
-      res.json(tags)
-     // res.render('index',{topics:pages,tags:tags}) 
+      res.render('index',{topics:pages,tags:tags}) 
        
     });
   
