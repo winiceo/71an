@@ -171,11 +171,14 @@ if (config.debug) {
 }
 
 if (!module.parent) {
-  app.listen(config.port, function () {
-    logger.log('NodeClub listening on port', config.port);
-    logger.log('God bless love....');
-    logger.log('You can debug your app with http://' + config.hostname + ':' + config.port);
-    logger.log('');
+  app.listen(9902, function () {
+     console.log(9902);
+  });
+  app.listen(9903, function () {
+     console.log(9903);
+  });
+  app.listen(9904, function () {
+     console.log(9904);
   });
 }
 

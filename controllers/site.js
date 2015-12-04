@@ -29,9 +29,9 @@ exports.index = function (req, res, next) {
   // 取主题
   var query = {};
   
-  if(tags!="undefined"&&tags) {
-    query['keywords']=new RegExp(tags);//模糊查询参数
-  }
+  // if(tags!="undefined"&&tags) {
+  //   query['keywords']=new RegExp('^'+tags+'$', "i");//new RegExp(tags);//模糊查询参数
+  // }
  
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
@@ -58,7 +58,8 @@ exports.index = function (req, res, next) {
   }));
   proxy.all('page_index',
     function ( pages) {
-      res.render('index',{topics:pages,tags:tags}) 
+      res.json(pages)
+      //res.render('index',{topics:pages,tags:tags}) 
        
     }); 
     
@@ -80,9 +81,9 @@ exports.loadmore = function (req, res, next) {
  // 取主题
   var query = {};
    
-  if(tags!="undefined"&&tags) {
-    query['keywords']=new RegExp(tags);//模糊查询参数
-  }
+  // if(tags!="undefined"&&tags) {
+  //   query['keywords']=new RegExp(tags);//模糊查询参数
+  // }
   
    
 
