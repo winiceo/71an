@@ -28,15 +28,14 @@ exports.index = function (req, res, next) {
 
   // 取主题
   var query = {};
-   
+  
   if(tags!="undefined"&&tags) {
     query['keywords']=new RegExp(tags);//模糊查询参数
   }
-
+ 
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
  
-
   
 // 取分页数据
   var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
@@ -45,8 +44,10 @@ exports.index = function (req, res, next) {
     if (pages) {
       proxy.emit('pages', pages);
     } else {
-      Article.find(query, {}, options, function (err, topics) {
-        cache.set(pagesCacheKey, topics, 60 * 1);
+        
+      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract"};
+      Article.find(query, fields,options, function (err, topics) {
+        cache.set(pagesCacheKey, topics, 60*1);
         proxy.emit('pages', topics);
       
       })
@@ -55,7 +56,8 @@ exports.index = function (req, res, next) {
   }));
   proxy.all('pages',
     function ( pages) {
-      res.render('index',{topics:pages,tags:tags}) 
+      res.json(tags)
+     // res.render('index',{topics:pages,tags:tags}) 
        
     });
   
@@ -96,7 +98,9 @@ exports.loadmore = function (req, res, next) {
     if (pages) {
       proxy.emit('ajaxpages', pages);
     } else {
-      Article.find(query, {}, options, function (err, topics) {
+      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract"};
+
+      Article.find(query, fields, options, function (err, topics) {
         cache.set(pagesCacheKey, topics, 60 * 1);
         proxy.emit('ajaxpages', topics);
       
@@ -189,9 +193,7 @@ exports.read = function (req, res, next) {
 
 //阅读
 exports.delete = function (req, res, next) {
- 
- 
-     
+  
 //article.save();
   var id= req.params.id;
       var query={};
@@ -211,18 +213,7 @@ exports.delete = function (req, res, next) {
            cache.set(readid, "");
           return res.status(200).send('ok');
      
-      })
-      
-       
-     
-
-
-  
-     
- 
-
-   
-
+      }) 
    
   
 };
