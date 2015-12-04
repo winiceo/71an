@@ -171,7 +171,7 @@ if (config.debug) {
 }
 
 if (!module.parent) {
-  app.listen(3000, function () {
+  app.listen(config.port, function () {
      console.log(3000);
   });
    
