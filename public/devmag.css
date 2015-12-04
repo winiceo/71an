@@ -27495,7 +27495,7 @@ a.fab:active {
 }
 
 .main-content-area {
-	padding-top: 50px
+	padding-top: 0px
 }
 
 .fa-bar-chart {
@@ -30848,4 +30848,17 @@ a.report_bug_handle:hover {
 .pulseWarningIns {
 	-webkit-animation: pulseWarningIns .75s infinite alternate;
 	animation: pulseWarningIns .75s infinite alternate
+}
+
+.tag-list .single-tag {
+	background: #ECEFF1;
+	color: #546E7A;
+	font-weight: 300;
+	-webkit-transition: all,.2s,ease-in-out,.2s;
+	-moz-transition: all,.2s,ease-in-out,.2s;
+	-ms-transition: all,.2s,ease-in-out,.2s;
+	-o-transition: all,.2s,ease-in-out,.2s;
+	transition: all,.2s,ease-in-out,.2s;
+	margin-bottom: 10px;
+	margin-right: 10px
 }

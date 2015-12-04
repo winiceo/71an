@@ -28,10 +28,10 @@
      
      
     
- <%- Loader('/public/devmag.min.css')
-.css('http://fonts.useso.com/css?family=Roboto:400,300,500,700,400italic')
+ <%- Loader('/public/css/devmag.min.css')
 .css('/public/css/devmag.min.css')
- .done(assets, config.site_static_host, config.mini_assets)
+.css('http://fonts.useso.com/css?family=Roboto:400,300,500,700,400italic')
+.done(assets, config.site_static_host, config.mini_assets)
 %>
 
       <!--[if lt IE 9]>
@@ -86,8 +86,8 @@
 </script>
  
 <!-- scripts -->
-  <%- Loader('/public/devmag.js')
-  .js('/public/devmag.min.js')
+  <%- Loader('/public/js/devmag.min.js')
+  .js('/public/js/devmag.min.js')
      .done(assets, config.site_static_host, config.mini_assets)
   %> 
 

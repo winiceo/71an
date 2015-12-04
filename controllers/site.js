@@ -39,30 +39,28 @@ exports.index = function (req, res, next) {
   
 // 取分页数据
   var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
+  
   cache.get(pagesCacheKey, proxy.done(function (pages) {
 
     if (pages) {
       proxy.emit('pages', pages);
     } else {
         
-      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract"};
+      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
       Article.find(query, fields,options, function (err, topics) {
         cache.set(pagesCacheKey, topics, 60*1);
-        proxy.emit('pages', topics);
+         
+        proxy.emit('page_index', topics);
       
       })
        
-    }
+     }
   }));
-  proxy.all('pages',
+  proxy.all('page_index',
     function ( pages) {
       res.render('index',{topics:pages,tags:tags}) 
        
-    });
-  
-  
-  
-   
+    }); 
     
 };
 
@@ -97,7 +95,7 @@ exports.loadmore = function (req, res, next) {
     if (pages) {
       proxy.emit('ajaxpages', pages);
     } else {
-      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract"};
+      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
 
       Article.find(query, fields, options, function (err, topics) {
         cache.set(pagesCacheKey, topics, 60 * 1);

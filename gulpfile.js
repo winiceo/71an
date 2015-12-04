@@ -17,10 +17,10 @@ var
 gulp.task('css', function() {
   return gulp.src('public/devmag.css')
     
-    .pipe(gulp.dest('dest/css'))
+    .pipe(gulp.dest('public'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(minifycss())
-    .pipe(gulp.dest('dest/css'))
+    .pipe(gulp.dest('public/css'))
     .pipe(notify({ message: 'css task ok' }));
 });
  
@@ -29,10 +29,10 @@ gulp.task('css', function() {
 gulp.task('js', function() {
   return gulp.src('public/devmag.js')
      
-    .pipe(gulp.dest('dest/js'))
+    .pipe(gulp.dest('public/js'))
     .pipe(rename({ suffix: '.min' }))
     .pipe(uglify())
-    .pipe(gulp.dest('dest/js'))
+    .pipe(gulp.dest('public/js'))
     .pipe(notify({ message: 'js task ok' }));
 });
  
