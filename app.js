@@ -171,15 +171,10 @@ if (config.debug) {
 }
 
 if (!module.parent) {
-  app.listen(9902, function () {
-     console.log(9902);
+  app.listen(3000, function () {
+     console.log(3000);
   });
-  app.listen(9903, function () {
-     console.log(9903);
-  });
-  app.listen(9904, function () {
-     console.log(9904);
-  });
+   
 }
 
 module.exports = app;

@@ -29,38 +29,47 @@ exports.index = function (req, res, next) {
   // 取主题
   var query = {};
   
-  // if(tags!="undefined"&&tags) {
-  //   query['keywords']=new RegExp('^'+tags+'$', "i");//new RegExp(tags);//模糊查询参数
-  // }
+  if(tags!="undefined"&&tags) {
+    query['keywords']=new RegExp( tags, "i");//new RegExp(tags);//模糊查询参数
+  }
  
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
  
   
 // 取分页数据
-  var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
+  var pagesCacheKey =  "pages1"+ JSON.stringify(options);
   
-  cache.get(pagesCacheKey, proxy.done(function (pages) {
-
-    if (pages) {
-      proxy.emit('pages', pages);
-    } else {
-        
-      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
+  var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
       Article.find(query, fields,options, function (err, topics) {
-        cache.set(pagesCacheKey, topics, 60*1);
-         
-        proxy.emit('page_index', topics);
+        
+        
+         res.render('index',{topics:topics,tags:tags}) 
+        //res.send(pages)
       
       })
+  // cache.get(pagesCacheKey, proxy.done(function (pages) {
+
+  //   if (pages) {
+  //     proxy.emit('pages', pages);
+  //   } else {
+        
+  //     var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
+  //     Article.find(query, fields,options, function (err, topics) {
+        
+        
+  //        cache.set(pagesCacheKey, topics, 3600*1);
+  //       proxy.emit('page_index', topics);
+      
+  //     })
        
-     }
-  }));
-  proxy.all('page_index',
-    function ( pages) {
-      res.render('index',{topics:pages,tags:tags}) 
-       
-    }); 
+  //    }
+  // }));
+  // proxy.all('page_index',
+  //   function ( pages) {
+  //      var pages=res.render('index',{topics:pages,tags:tags}) 
+  //     res.send(pages)
+  //   }); 
     
 };
 
@@ -80,36 +89,42 @@ exports.loadmore = function (req, res, next) {
  // 取主题
   var query = {};
    
-  // if(tags!="undefined"&&tags) {
-  //   query['keywords']=new RegExp(tags);//模糊查询参数
-  // }
+  if(tags!="undefined"&&tags) {
+    query['keywords']=new RegExp(tags);//模糊查询参数
+  }
   
    
 
   var limit = config.list_topic_count;
   var options = { skip: skip, limit: limit,sort:{"datetime":-1}};
 // 取分页数据
-  var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
-  cache.get(pagesCacheKey, proxy.done(function (pages) {
-    
-    if (pages) {
-      proxy.emit('ajaxpages', pages);
-    } else {
-      var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
+var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
 
       Article.find(query, fields, options, function (err, topics) {
-        cache.set(pagesCacheKey, topics, 60 * 1);
-        proxy.emit('ajaxpages', topics);
+        res.json({topics:topics}) 
       
       })
+  // var pagesCacheKey = JSON.stringify(query) + JSON.stringify(options);
+  // cache.get(pagesCacheKey, proxy.done(function (pages) {
+    
+  //   if (pages) {
+  //     proxy.emit('ajaxpages', pages);
+  //   } else {
+  //     var fields={title:"title",_id:"_id",datetime:"datetime",image_list:"image_list",abstract:"abstract",keywords:"keywords"};
+
+  //     Article.find(query, fields, options, function (err, topics) {
+  //       cache.set(pagesCacheKey, topics, 60 * 1);
+  //       proxy.emit('ajaxpages', topics);
+      
+  //     })
        
-    }
-  }));
-  proxy.all('ajaxpages',
-    function ( pages) {
-      res.json({topics:pages}) 
+  //   }
+  // }));
+  // proxy.all('ajaxpages',
+  //   function ( pages) {
+  //     res.json({topics:pages}) 
        
-    }); 
+  //   }); 
   
   
 };
